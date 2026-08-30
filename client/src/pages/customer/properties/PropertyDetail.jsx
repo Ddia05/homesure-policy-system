@@ -61,7 +61,7 @@ export default function PropertyDetail() {
             <Edit size={16} className="btn-icon" />
             Edit
           </Link>
-          <button onClick={handleDelete} className="btn" style={{ backgroundColor: 'var(--status-red)', color: 'white' }}>
+          <button onClick={handleDelete} className="btn btn-danger">
             <Trash2 size={16} className="btn-icon" />
             Delete
           </button>

@@ -33,23 +33,18 @@ export default function Login() {
 
   return (
     <div className="auth-layout">
-      {/* Left Branding Side */}
-      <div className="auth-sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-          <Shield size={48} color="white" style={{ marginRight: '16px' }} />
-          <h1>HomeSure</h1>
+      <div className="auth-card">
+        <div className="auth-header">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+            <Shield size={24} color="white" style={{ marginRight: '8px' }} />
+            <h1>HomeSure</h1>
+          </div>
+          <p>Enterprise Policy Administration System</p>
         </div>
-        <p>
-          Enterprise Policy Administration System. Manage properties, assess risks, 
-          generate quotes, and track policy lifecycles with our comprehensive platform.
-        </p>
-      </div>
 
-      {/* Right Content Side */}
-      <div className="auth-content">
-        <div className="auth-form-container">
-          <h2>Sign In</h2>
-          <p className="subtitle">Welcome back. Please enter your credentials to access your account.</p>
+        <div className="auth-body">
+          <h2 className="auth-title">System Login</h2>
+          <p className="auth-subtitle">Enter credentials to access your workspace</p>
           
           {error && <div className="error-message">{error}</div>}
           
@@ -80,13 +75,13 @@ export default function Login() {
               />
             </div>
             
-            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '8px', padding: '12px' }} disabled={isLoading}>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '8px' }} disabled={isLoading}>
               {isLoading ? 'Authenticating...' : 'Sign In'}
             </button>
           </form>
           
-          <div style={{ marginTop: '32px', fontSize: '14px', textAlign: 'center', color: 'var(--text-muted)' }}>
-            Are you a new customer? <Link to="/register" style={{ fontWeight: '600' }}>Register here</Link>
+          <div className="auth-footer">
+            New to HomeSure? <Link to="/register">Create an account</Link>
           </div>
         </div>
       </div>

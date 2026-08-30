@@ -60,23 +60,18 @@ export default function Register() {
 
   return (
     <div className="auth-layout">
-      {/* Left Branding Side */}
-      <div className="auth-sidebar">
-        <div style={{ display: 'flex', alignItems: 'center', marginBottom: '32px' }}>
-          <Shield size={48} color="white" style={{ marginRight: '16px' }} />
-          <h1>HomeSure</h1>
+      <div className="auth-card" style={{ maxWidth: '500px' }}>
+        <div className="auth-header">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '8px' }}>
+            <Shield size={24} color="white" style={{ marginRight: '8px' }} />
+            <h1>HomeSure</h1>
+          </div>
+          <p>Enterprise Policy Administration System</p>
         </div>
-        <p>
-          Enterprise Policy Administration System. Create an account to easily request 
-          insurance quotes and manage your properties.
-        </p>
-      </div>
 
-      {/* Right Content Side */}
-      <div className="auth-content">
-        <div className="auth-form-container" style={{ maxWidth: '480px' }}>
-          <h2>Customer Registration</h2>
-          <p className="subtitle">Create a new customer profile to get started.</p>
+        <div className="auth-body">
+          <h2 className="auth-title">Customer Registration</h2>
+          <p className="auth-subtitle">Create a new customer profile</p>
           
           {error && <div className="error-message">{error}</div>}
           
@@ -132,8 +127,8 @@ export default function Register() {
               />
             </div>
             
-            <div style={{ display: 'flex', gap: '16px' }}>
-              <div className="form-group" style={{ flex: 1 }}>
+            <div className="form-grid">
+              <div className="form-group">
                 <label className="form-label" htmlFor="password">Password</label>
                 <input 
                   id="password"
@@ -146,7 +141,7 @@ export default function Register() {
                 />
               </div>
 
-              <div className="form-group" style={{ flex: 1 }}>
+              <div className="form-group">
                 <label className="form-label" htmlFor="confirmPassword">Confirm Password</label>
                 <input 
                   id="confirmPassword"
@@ -160,13 +155,13 @@ export default function Register() {
               </div>
             </div>
             
-            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: '8px', padding: '12px' }} disabled={isLoading}>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '8px' }} disabled={isLoading}>
               {isLoading ? 'Processing...' : 'Register Account'}
             </button>
           </form>
           
-          <div style={{ marginTop: '32px', fontSize: '14px', textAlign: 'center', color: 'var(--text-muted)' }}>
-            Already have an account? <Link to="/login" style={{ fontWeight: '600' }}>Sign in here</Link>
+          <div className="auth-footer">
+            Already have an account? <Link to="/login">Sign in here</Link>
           </div>
         </div>
       </div>
