@@ -35,9 +35,10 @@ export default function AgentApplicationDetail() {
     try {
       setActionLoading(true);
       setError(null);
-      const updated = await applicationService.approve(id, reviewNotes);
+      await applicationService.approve(id, reviewNotes);
       // Fetch latest to get full joined data again
-      fetchApplication();
+      await fetchApplication();
+      setActionLoading(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to approve application.');
       setActionLoading(false);
@@ -52,9 +53,10 @@ export default function AgentApplicationDetail() {
     try {
       setActionLoading(true);
       setError(null);
-      const updated = await applicationService.reject(id, reviewNotes);
-      fetchApplication();
+      await applicationService.reject(id, reviewNotes);
+      await fetchApplication();
       setShowRejectForm(false);
+      setActionLoading(false);
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to reject application.');
       setActionLoading(false);
@@ -98,7 +100,7 @@ export default function AgentApplicationDetail() {
             <StatusBadge status={application.status} />
           </h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '4px' }}>
-            Submitted by {customer?.first_name} {customer?.last_name} on {new Date(application.created_at).toLocaleDateString()}
+            Submitted by {customer?.name || 'N/A'} on {new Date(application.submitted_at).toLocaleDateString()}
           </p>
         </div>
       </div>
@@ -117,11 +119,11 @@ export default function AgentApplicationDetail() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Name</div>
-                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{customer?.first_name} {customer?.last_name}</div>
+                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{customer?.name || 'N/A'}</div>
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Email</div>
-                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{customer?.email}</div>
+                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{customer?.User?.email || customer?.email || 'N/A'}</div>
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Phone</div>

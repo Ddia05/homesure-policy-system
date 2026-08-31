@@ -42,7 +42,7 @@ export default function AgentPolicyRequestList() {
       const matchesSearch = 
         `REQ-${req.id.toString().padStart(4, '0')}`.toLowerCase().includes(searchStr) ||
         (req.Policy?.policy_number || '').toLowerCase().includes(searchStr) ||
-        (req.Customer?.first_name + ' ' + req.Customer?.last_name).toLowerCase().includes(searchStr);
+        (req.Customer?.name || '').toLowerCase().includes(searchStr);
       
       return matchesStatus && matchesType && matchesSearch;
     });
@@ -131,10 +131,10 @@ export default function AgentPolicyRequestList() {
                   <tr key={req.id}>
                     <td style={{ fontWeight: '500' }}>REQ-{req.id.toString().padStart(4, '0')}</td>
                     <td style={{ fontWeight: '600', color: 'var(--primary-navy)' }}>{req.Policy?.policy_number}</td>
-                    <td>{req.Customer?.first_name} {req.Customer?.last_name}</td>
+                    <td>{req.Customer?.name || 'N/A'}</td>
                     <td>{getRequestTypeName(req.request_type)}</td>
                     <td><StatusBadge status={req.status} /></td>
-                    <td>{new Date(req.created_at).toLocaleDateString()}</td>
+                    <td>{new Date(req.requested_at).toLocaleDateString()}</td>
                     <td style={{ textAlign: 'right' }}>
                       <Link to={`/agent/policy-requests/${req.id}`} className="btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }}>
                         Review

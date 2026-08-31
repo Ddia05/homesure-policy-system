@@ -46,7 +46,7 @@ export default function ApplicationDetail() {
             <StatusBadge status={application.status} />
           </h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '4px' }}>
-            Submitted on {new Date(application.created_at).toLocaleDateString()}
+            Submitted on {new Date(application.submitted_at).toLocaleDateString()}
           </p>
         </div>
       </div>

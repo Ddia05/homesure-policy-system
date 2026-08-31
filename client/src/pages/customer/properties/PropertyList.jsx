@@ -90,7 +90,7 @@ export default function PropertyList() {
               <table className="data-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>#</th>
                     <th>Address</th>
                     <th>Type</th>
                     <th>Value</th>
@@ -100,9 +100,9 @@ export default function PropertyList() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProperties.map(property => (
+                  {filteredProperties.map((property, index) => (
                     <tr key={property.id}>
-                      <td style={{ fontWeight: '500' }}>{property.id}</td>
+                      <td style={{ fontWeight: '500' }}>{index + 1}</td>
                       <td>{property.address}</td>
                       <td>{property.property_type.replace(/_/g, ' ')}</td>
                       <td>${parseFloat(property.property_value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>

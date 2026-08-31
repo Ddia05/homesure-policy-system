@@ -9,10 +9,10 @@ export default function PropertyForm() {
 
   const [formData, setFormData] = useState({
     address: '',
-    property_type: 'SINGLE_FAMILY',
+    property_type: '',
     property_value: '',
-    construction_year: new Date().getFullYear(),
-    construction_type: 'WOOD',
+    construction_year: '',
+    construction_type: '',
     security_system: false
   });
   
@@ -126,10 +126,11 @@ export default function PropertyForm() {
                 onChange={handleChange}
                 required
               >
-                <option value="SINGLE_FAMILY">Single Family</option>
-                <option value="MULTI_FAMILY">Multi Family</option>
+                <option value="" disabled>Select Property Type</option>
+                <option value="INDEPENDENT_HOUSE">Single Family / Independent House</option>
+                <option value="APARTMENT">Apartment</option>
+                <option value="VILLA">Villa</option>
                 <option value="TOWNHOUSE">Townhouse</option>
-                <option value="CONDO">Condo</option>
               </select>
             </div>
             
@@ -160,6 +161,7 @@ export default function PropertyForm() {
                 id="construction_year"
                 name="construction_year"
                 type="number" 
+                placeholder="YYYY"
                 min="1800"
                 max={new Date().getFullYear()}
                 className="form-input" 
@@ -179,6 +181,7 @@ export default function PropertyForm() {
                 onChange={handleChange}
                 required
               >
+                <option value="" disabled>Select Construction Type</option>
                 <option value="WOOD">Wood Frame</option>
                 <option value="BRICK">Brick</option>
                 <option value="CONCRETE">Concrete</option>

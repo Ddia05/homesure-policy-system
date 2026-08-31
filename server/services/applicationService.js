@@ -1,8 +1,16 @@
-const { Application, Quote, Customer, User, Property, InsurancePlan, Coverage } = require('../models');
+const {
+  Application,
+  Quote,
+  Customer,
+  User,
+  Property,
+  InsurancePlan,
+  Coverage,
+} = require("../models");
 
 const getCustomerId = async (userId) => {
   const customer = await Customer.findOne({ where: { user_id: userId } });
-  if (!customer) throw new Error('Customer not found');
+  if (!customer) throw new Error("Customer not found");
   return customer.id;
 };
 
@@ -11,32 +19,34 @@ const submitApplication = async (userId, quoteId) => {
   const customerId = await getCustomerId(userId);
 
   const quote = await Quote.findOne({
-    where: { id: quoteId, customer_id: customerId }
+    where: { id: quoteId, customer_id: customerId },
   });
 
   if (!quote) {
-    throw new Error('Quote not found or does not belong to the customer');
+    throw new Error("Quote not found or does not belong to the customer");
   }
 
   // Check if quote status allows submission
-  if (quote.status === 'ACCEPTED') {
-    throw new Error('Quote has already been submitted as an application');
+  if (quote.status === "ACCEPTED") {
+    throw new Error("Quote has already been submitted as an application");
   }
 
   // Check if application already exists for this quote
-  const existingApp = await Application.findOne({ where: { quote_id: quoteId } });
+  const existingApp = await Application.findOne({
+    where: { quote_id: quoteId },
+  });
   if (existingApp) {
-    throw new Error('An application for this quote already exists');
+    throw new Error("An application for this quote already exists");
   }
 
   // Update quote status
-  await quote.update({ status: 'ACCEPTED' });
+  await quote.update({ status: "ACCEPTED" });
 
   // Create application
   return await Application.create({
     quote_id: quoteId,
     customer_id: customerId,
-    status: 'SUBMITTED'
+    status: "SUBMITTED",
   });
 };
 
@@ -47,12 +57,9 @@ const getCustomerApplications = async (userId) => {
     include: [
       {
         model: Quote,
-        include: [
-          { model: Property },
-          { model: InsurancePlan }
-        ]
-      }
-    ]
+        include: [{ model: Property }, { model: InsurancePlan }],
+      },
+    ],
   });
 };
 
@@ -65,13 +72,16 @@ const getCustomerApplicationById = async (userId, applicationId) => {
         model: Quote,
         include: [
           { model: Property },
-          { model: InsurancePlan, include: [{ model: Coverage, through: { attributes: [] } }] }
-        ]
-      }
-    ]
+          {
+            model: InsurancePlan,
+            include: [{ model: Coverage, through: { attributes: [] } }],
+          },
+        ],
+      },
+    ],
   });
 
-  if (!application) throw new Error('Application not found');
+  if (!application) throw new Error("Application not found");
   return application;
 };
 
@@ -79,56 +89,72 @@ const getCustomerApplicationById = async (userId, applicationId) => {
 const getAllApplications = async () => {
   return await Application.findAll({
     include: [
-      { model: Customer },
+      {
+        model: Customer,
+        include: [{ model: User, attributes: ["email"] }],
+      },
       {
         model: Quote,
-        include: [{ model: Property }, { model: InsurancePlan }]
+        include: [{ model: Property }, { model: InsurancePlan }],
       },
-      { model: User, as: 'reviewer', attributes: ['id', 'email'] }
-    ]
+      { model: User, as: "reviewer", attributes: ["id", "email"] },
+    ],
   });
 };
 
 const getApplicationForReview = async (applicationId) => {
   const application = await Application.findByPk(applicationId, {
     include: [
-      { model: Customer },
+      {
+        model: Customer,
+        include: [{ model: User, attributes: ["email"] }],
+      },
       {
         model: Quote,
         include: [
           { model: Property },
-          { model: InsurancePlan, include: [{ model: Coverage, through: { attributes: [] } }] }
-        ]
+          {
+            model: InsurancePlan,
+            include: [{ model: Coverage, through: { attributes: [] } }],
+          },
+        ],
       },
-      { model: User, as: 'reviewer', attributes: ['id', 'email'] }
-    ]
+      { model: User, as: "reviewer", attributes: ["id", "email"] },
+    ],
   });
 
-  if (!application) throw new Error('Application not found');
+  if (!application) throw new Error("Application not found");
 
   // Transition to UNDER_REVIEW if it is currently SUBMITTED
-  if (application.status === 'SUBMITTED') {
-    await application.update({ status: 'UNDER_REVIEW' });
+  if (application.status === "SUBMITTED") {
+    await application.update({ status: "UNDER_REVIEW" });
   }
 
   return application;
 };
 
-const reviewApplication = async (applicationId, agentUserId, action, reviewNotes) => {
+const reviewApplication = async (
+  applicationId,
+  agentUserId,
+  action,
+  reviewNotes,
+) => {
   const application = await Application.findByPk(applicationId);
-  
-  if (!application) throw new Error('Application not found');
-  if (['APPROVED', 'REJECTED'].includes(application.status)) {
-    throw new Error('Application has already been ' + application.status.toLowerCase());
+
+  if (!application) throw new Error("Application not found");
+  if (["APPROVED", "REJECTED"].includes(application.status)) {
+    throw new Error(
+      "Application has already been " + application.status.toLowerCase(),
+    );
   }
 
-  const newStatus = action === 'APPROVE' ? 'APPROVED' : 'REJECTED';
+  const newStatus = action === "APPROVE" ? "APPROVED" : "REJECTED";
 
   await application.update({
     status: newStatus,
     reviewed_by: agentUserId,
     review_notes: reviewNotes,
-    reviewed_at: new Date()
+    reviewed_at: new Date(),
   });
 
   return application;
@@ -140,5 +166,5 @@ module.exports = {
   getCustomerApplicationById,
   getAllApplications,
   getApplicationForReview,
-  reviewApplication
+  reviewApplication,
 };

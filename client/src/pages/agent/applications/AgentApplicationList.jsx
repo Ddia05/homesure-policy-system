@@ -34,7 +34,7 @@ export default function AgentApplicationList() {
       const searchStr = searchTerm.toLowerCase();
       const matchesSearch = 
         `APP-${app.id.toString().padStart(4, '0')}`.toLowerCase().includes(searchStr) ||
-        (app.Customer?.first_name + ' ' + app.Customer?.last_name).toLowerCase().includes(searchStr) ||
+        (app.Customer?.name || '').toLowerCase().includes(searchStr) ||
         (app.Quote?.Property?.address || '').toLowerCase().includes(searchStr);
       return matchesStatus && matchesSearch;
     });
@@ -118,7 +118,7 @@ export default function AgentApplicationList() {
                 {filteredApplications.map(app => (
                   <tr key={app.id}>
                     <td style={{ fontWeight: '500' }}>APP-{app.id.toString().padStart(4, '0')}</td>
-                    <td>{app.Customer?.first_name} {app.Customer?.last_name}</td>
+                    <td>{app.Customer?.name || 'N/A'}</td>
                     <td>{app.Quote?.Property?.address || 'Unknown'}</td>
                     <td>{app.Quote?.InsurancePlan?.name || 'Unknown'}</td>
                     <td style={{ fontWeight: '600', color: getRiskColor(app.Quote?.risk_level) }}>
@@ -128,7 +128,7 @@ export default function AgentApplicationList() {
                       ${parseFloat(app.Quote?.premium || 0).toLocaleString()}
                     </td>
                     <td><StatusBadge status={app.status} /></td>
-                    <td>{new Date(app.created_at).toLocaleDateString()}</td>
+                    <td>{new Date(app.submitted_at || app.createdAt).toLocaleDateString()}</td>
                     <td style={{ textAlign: 'right' }}>
                       <Link to={`/agent/applications/${app.id}`} className="btn-primary" style={{ padding: '6px 12px', fontSize: '13px' }}>
                         Review

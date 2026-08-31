@@ -22,5 +22,24 @@ export const dashboardService = {
       console.error('Error fetching dashboard data:', error);
       throw error;
     }
+  },
+
+  async getAgentDashboardData() {
+    try {
+      const [applicationsRes, policiesRes, requestsRes] = await Promise.all([
+        api.get('/agent/applications'),
+        api.get('/agent/policies'),
+        api.get('/agent/policy-requests')
+      ]);
+
+      return {
+        applications: applicationsRes.data.applications || [],
+        policies: policiesRes.data.policies || [],
+        policyRequests: requestsRes.data.policyRequests || requestsRes.data.requests || []
+      };
+    } catch (error) {
+      console.error('Error fetching agent dashboard data:', error);
+      throw error;
+    }
   }
 };

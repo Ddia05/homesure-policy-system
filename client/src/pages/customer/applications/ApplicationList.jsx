@@ -62,7 +62,7 @@ export default function ApplicationList() {
                     <td>{app.Quote?.Property?.address || 'Unknown'}</td>
                     <td>{app.Quote?.InsurancePlan?.name || 'Unknown'}</td>
                     <td><StatusBadge status={app.status} /></td>
-                    <td>{new Date(app.created_at).toLocaleDateString()}</td>
+                    <td>{new Date(app.submitted_at).toLocaleDateString()}</td>
                     <td style={{ textAlign: 'right' }}>
                       <Link to={`/customer/applications/${app.id}`} style={{ color: 'var(--action-blue)', display: 'inline-flex', alignItems: 'center', fontSize: '14px', fontWeight: '500' }}>
                         <Eye size={16} style={{ marginRight: '4px' }} />

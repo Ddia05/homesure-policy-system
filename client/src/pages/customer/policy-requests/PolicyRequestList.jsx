@@ -69,7 +69,7 @@ export default function PolicyRequestList() {
                     </td>
                     <td>{getRequestTypeName(req.request_type)}</td>
                     <td><StatusBadge status={req.status} /></td>
-                    <td>{new Date(req.created_at).toLocaleDateString()}</td>
+                    <td>{new Date(req.requested_at).toLocaleDateString()}</td>
                   </tr>
                 ))}
               </tbody>

@@ -1,9 +1,15 @@
-const { Quote, Customer, Property, InsurancePlan, Coverage } = require('../models');
-const riskService = require('./riskService');
+const {
+  Quote,
+  Customer,
+  Property,
+  InsurancePlan,
+  Coverage,
+} = require("../models");
+const riskService = require("./riskService");
 
 const getCustomerId = async (userId) => {
   const customer = await Customer.findOne({ where: { user_id: userId } });
-  if (!customer) throw new Error('Customer not found');
+  if (!customer) throw new Error("Customer not found");
   return customer.id;
 };
 
@@ -12,18 +18,18 @@ const generateQuote = async (userId, propertyId, planId) => {
 
   // Validate Property
   const property = await Property.findOne({
-    where: { id: propertyId, customer_id: customerId }
+    where: { id: propertyId, customer_id: customerId },
   });
   if (!property) {
-    throw new Error('Property not found or does not belong to the customer');
+    throw new Error("Property not found or does not belong to the customer");
   }
 
   // Validate Insurance Plan and fetch coverages
   const plan = await InsurancePlan.findByPk(planId, {
-    include: [{ model: Coverage, through: { attributes: [] } }]
+    include: [{ model: Coverage, through: { attributes: [] } }],
   });
   if (!plan) {
-    throw new Error('Insurance plan not found');
+    throw new Error("Insurance plan not found");
   }
 
   // 1. Calculate Risk
@@ -31,7 +37,7 @@ const generateQuote = async (userId, propertyId, planId) => {
 
   // 2. Calculate Premium
   let totalPremium = Number(plan.base_premium);
-  
+
   // Add additional premiums from all associated coverages
   if (plan.Coverages && plan.Coverages.length > 0) {
     for (const coverage of plan.Coverages) {
@@ -40,9 +46,9 @@ const generateQuote = async (userId, propertyId, planId) => {
   }
 
   // Apply Risk Multiplier
-  let riskMultiplier = 1.00;
-  if (riskLevel === 'MEDIUM') riskMultiplier = 1.15;
-  if (riskLevel === 'HIGH') riskMultiplier = 1.30;
+  let riskMultiplier = 1.0;
+  if (riskLevel === "MEDIUM") riskMultiplier = 1.15;
+  if (riskLevel === "HIGH") riskMultiplier = 1.3;
 
   totalPremium = totalPremium * riskMultiplier;
 
@@ -57,7 +63,7 @@ const generateQuote = async (userId, propertyId, planId) => {
     premium: finalPremium,
     risk_score: riskScore,
     risk_level: riskLevel,
-    status: 'GENERATED'
+    status: "GENERATED",
   });
 
   // 4. Return detailed response
@@ -67,8 +73,8 @@ const generateQuote = async (userId, propertyId, planId) => {
     plan,
     riskAssessment: {
       score: riskScore,
-      level: riskLevel
-    }
+      level: riskLevel,
+    },
   };
 };
 
@@ -78,11 +84,11 @@ const getQuotesByCustomer = async (userId) => {
     where: { customer_id: customerId },
     include: [
       { model: Property },
-      { 
+      {
         model: InsurancePlan,
-        include: [{ model: Coverage, through: { attributes: [] } }]
-      }
-    ]
+        include: [{ model: Coverage, through: { attributes: [] } }],
+      },
+    ],
   });
 };
 
@@ -92,20 +98,21 @@ const getQuoteByIdAndCustomer = async (quoteId, userId) => {
     where: { id: quoteId, customer_id: customerId },
     include: [
       { model: Property },
-      { 
+      {
         model: InsurancePlan,
-        include: [{ model: Coverage, through: { attributes: [] } }]
-      }
-    ]
+        include: [{ model: Coverage, through: { attributes: [] } }],
+      },
+    ],
   });
 
-  if (!quote) throw new Error('Quote not found or does not belong to the customer');
-  
+  if (!quote)
+    throw new Error("Quote not found or does not belong to the customer");
+
   return quote;
 };
 
 module.exports = {
   generateQuote,
   getQuotesByCustomer,
-  getQuoteByIdAndCustomer
+  getQuoteByIdAndCustomer,
 };

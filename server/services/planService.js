@@ -1,4 +1,4 @@
-const { InsurancePlan, Coverage } = require('../models');
+const { InsurancePlan, Coverage } = require("../models");
 
 const getAllPlans = async () => {
   return await InsurancePlan.findAll();
@@ -9,13 +9,13 @@ const getPlanById = async (planId) => {
     include: [
       {
         model: Coverage,
-        through: { attributes: [] } // Exclude the join table attributes from the response
-      }
-    ]
+        through: { attributes: [] }, // Exclude the join table attributes from the response
+      },
+    ],
   });
 
   if (!plan) {
-    throw new Error('Insurance plan not found');
+    throw new Error("Insurance plan not found");
   }
 
   return plan;
@@ -28,5 +28,5 @@ const getAllCoverages = async () => {
 module.exports = {
   getAllPlans,
   getPlanById,
-  getAllCoverages
+  getAllCoverages,
 };

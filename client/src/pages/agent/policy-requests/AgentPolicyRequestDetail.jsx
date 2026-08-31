@@ -77,7 +77,7 @@ export default function AgentPolicyRequestDetail() {
             <StatusBadge status={request.status} />
           </h1>
           <p style={{ color: 'var(--text-muted)', marginTop: '4px' }}>
-            Submitted by {customer?.first_name} {customer?.last_name} on {new Date(request.created_at).toLocaleDateString()}
+            Submitted by {customer?.name || 'N/A'} on {new Date(request.requested_at).toLocaleDateString()}
           </p>
         </div>
       </div>
@@ -136,7 +136,7 @@ export default function AgentPolicyRequestDetail() {
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Customer Name</div>
-                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{customer?.first_name} {customer?.last_name}</div>
+                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{customer?.name || 'N/A'}</div>
               </div>
               <div style={{ gridColumn: 'span 2' }}>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Insured Property</div>
@@ -189,7 +189,7 @@ export default function AgentPolicyRequestDetail() {
                 </div>
                 {request.reviewed_by && (
                   <div style={{ fontSize: '13px', color: 'var(--text-muted)', marginTop: '8px' }}>
-                    Action taken by Agent ID: {request.reviewed_by} on {new Date(request.updated_at).toLocaleDateString()}
+                    Action taken by Agent ID: {request.reviewed_by} on {new Date(request.reviewed_at).toLocaleDateString()}
                   </div>
                 )}
               </div>

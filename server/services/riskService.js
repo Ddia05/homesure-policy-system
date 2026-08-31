@@ -23,9 +23,9 @@ const calculateRiskScore = (property) => {
   }
 
   // Construction type rule
-  if (property.construction_type === 'WOOD') {
+  if (property.construction_type === "WOOD") {
     score += 15;
-  } else if (property.construction_type === 'MIXED') {
+  } else if (property.construction_type === "MIXED") {
     score += 10;
   } else {
     // BRICK or CONCRETE
@@ -47,11 +47,11 @@ const calculateRiskScore = (property) => {
  */
 const determineRiskLevel = (score) => {
   if (score <= 20) {
-    return 'LOW';
+    return "LOW";
   } else if (score <= 40) {
-    return 'MEDIUM';
+    return "MEDIUM";
   } else {
-    return 'HIGH';
+    return "HIGH";
   }
 };
 
@@ -61,15 +61,15 @@ const determineRiskLevel = (score) => {
 const assessRisk = (property) => {
   const riskScore = calculateRiskScore(property);
   const riskLevel = determineRiskLevel(riskScore);
-  
+
   return {
     riskScore,
-    riskLevel
+    riskLevel,
   };
 };
 
 module.exports = {
   assessRisk,
   calculateRiskScore,
-  determineRiskLevel
+  determineRiskLevel,
 };

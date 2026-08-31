@@ -61,11 +61,11 @@ export default function AgentPolicyDetail() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Name</div>
-                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{policy.Customer?.first_name} {policy.Customer?.last_name}</div>
+                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{policy.Customer?.name || 'N/A'}</div>
               </div>
               <div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Email</div>
-                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{policy.Customer?.email}</div>
+                <div style={{ fontSize: '15px', color: 'var(--text-main)', marginTop: '4px' }}>{policy.Customer?.User?.email || policy.Customer?.email || 'N/A'}</div>
               </div>
               <div style={{ gridColumn: 'span 2' }}>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', fontWeight: '600', textTransform: 'uppercase' }}>Customer Address</div>

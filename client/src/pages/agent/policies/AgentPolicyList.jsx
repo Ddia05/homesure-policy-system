@@ -34,7 +34,7 @@ export default function AgentPolicyList() {
       const searchStr = searchTerm.toLowerCase();
       const matchesSearch = 
         policy.policy_number.toLowerCase().includes(searchStr) ||
-        (policy.Customer?.first_name + ' ' + policy.Customer?.last_name).toLowerCase().includes(searchStr) ||
+        (policy.Customer?.name || '').toLowerCase().includes(searchStr) ||
         (policy.Property?.address || '').toLowerCase().includes(searchStr);
       return matchesStatus && matchesSearch;
     });
@@ -108,7 +108,7 @@ export default function AgentPolicyList() {
                 {filteredPolicies.map(policy => (
                   <tr key={policy.id}>
                     <td style={{ fontWeight: '600', color: 'var(--primary-navy)' }}>{policy.policy_number}</td>
-                    <td>{policy.Customer?.first_name} {policy.Customer?.last_name}</td>
+                    <td>{policy.Customer?.name || 'N/A'}</td>
                     <td>{policy.Property?.address || 'Unknown'}</td>
                     <td>{policy.InsurancePlan?.name || 'Unknown'}</td>
                     <td style={{ fontWeight: '600' }}>${parseFloat(policy.premium).toLocaleString()}</td>

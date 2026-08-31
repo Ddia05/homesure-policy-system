@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { dashboardService } from '../services/dashboardService';
 import { StatusBadge } from '../components/ui/StatusBadge';
-import { PlusCircle, FileText, Shield } from 'lucide-react';
+import { PlusCircle, FileText, Shield, FileCheck, ClipboardList, Activity } from 'lucide-react';
 
 export default function Dashboard({ role }) {
   const { user } = useAuth();
@@ -12,33 +12,178 @@ export default function Dashboard({ role }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Only customer logic in this particular Dashboard for now
-    if (role === 'CUSTOMER') {
-      const fetchData = async () => {
-        try {
+    const fetchData = async () => {
+      try {
+        if (role === 'CUSTOMER') {
           const dashboardData = await dashboardService.getCustomerDashboardData();
           setData(dashboardData);
-        } catch (err) {
-          setError('Failed to load dashboard data. Please try again later.');
-        } finally {
-          setLoading(false);
+        } else if (role === 'AGENT') {
+          const dashboardData = await dashboardService.getAgentDashboardData();
+          setData(dashboardData);
         }
-      };
-      fetchData();
-    } else {
-      setLoading(false); // We'll implement agent dashboard later
-    }
+      } catch (err) {
+        setError('Failed to load dashboard data. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, [role]);
 
   if (loading) return <div className="loading-state">Loading workspace...</div>;
   
   if (role === 'AGENT') {
+    const pendingApps = data?.applications?.filter(a => a.status === 'SUBMITTED' || a.status === 'UNDER_REVIEW') || [];
+    const activePolicies = data?.policies?.filter(p => p.status === 'ACTIVE') || [];
+    const pendingRequests = data?.policyRequests?.filter(r => r.status === 'PENDING') || [];
+
+    const allAgentActivity = [
+      ...(data?.applications || []).map(a => ({ type: 'Application', id: a.id, ref: `APP-${a.id}`, status: a.status, date: a.submitted_at || a.createdAt, link: `/agent/applications/${a.id}` })),
+      ...(data?.policies || []).map(p => ({ type: 'Policy', id: p.id, ref: p.policy_number, status: p.status, date: p.created_at || p.createdAt, link: `/agent/policies/${p.id}` })),
+      ...(data?.policyRequests || []).map(r => ({ type: 'Request', id: r.id, ref: `REQ-${r.id}`, status: r.status, date: r.requested_at || r.createdAt, link: `/agent/policy-requests/${r.id}` }))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
+
+    const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
     return (
       <div>
-        <h1 className="page-title">Agent Overview</h1>
-        <p style={{ color: 'var(--text-muted)', marginTop: '8px', marginBottom: '24px' }}>
-          Welcome back, {user?.name || user?.email}. Agent workspace is pending implementation.
-        </p>
+        <div className="page-header">
+          <h1 className="page-title">Agent Dashboard</h1>
+        </div>
+        
+        {/* Context Section */}
+        <div className="card" style={{ marginBottom: 'var(--spacing-lg)' }}>
+          <div className="card-body">
+            <h3 style={{ fontSize: '16px', color: 'var(--primary-navy)', margin: '0 0 8px 0' }}>Welcome back, {user?.name || user?.email}</h3>
+            <p style={{ color: 'var(--text-muted)', margin: 0, fontSize: '13px' }}>
+              {currentDate} • Review incoming applications, manage policies, and process endorsements.
+            </p>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: 'var(--spacing-lg)' }}>
+          <Link to="/agent/applications" className="btn btn-primary">
+            <FileCheck size={16} className="btn-icon" />
+            Review Applications
+          </Link>
+          <Link to="/agent/policies" className="btn btn-secondary">
+            <Shield size={16} className="btn-icon" />
+            Manage Policies
+          </Link>
+          <Link to="/agent/policy-requests" className="btn btn-secondary">
+            <ClipboardList size={16} className="btn-icon" />
+            Process Requests
+          </Link>
+        </div>
+
+        {/* Summary Grid */}
+        <div className="info-grid" style={{ marginBottom: 'var(--spacing-lg)' }}>
+          <div className="card">
+            <div className="card-body">
+              <div className="info-item">
+                <div className="label">Pending Applications</div>
+                <div className="value" style={{ fontSize: '24px', marginTop: '4px' }}>{pendingApps.length}</div>
+              </div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-body">
+              <div className="info-item">
+                <div className="label">Pending Requests</div>
+                <div className="value" style={{ fontSize: '24px', marginTop: '4px' }}>{pendingRequests.length}</div>
+              </div>
+            </div>
+          </div>
+          <div className="card">
+            <div className="card-body">
+              <div className="info-item">
+                <div className="label">Active Policies Managed</div>
+                <div className="value" style={{ fontSize: '24px', marginTop: '4px' }}>{activePolicies.length}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 'var(--spacing-lg)' }}>
+          {/* Recent Applications Table */}
+          <div className="card">
+            <div className="card-header">
+              <h3>Applications Needing Review</h3>
+            </div>
+            <div className="data-table-container">
+              {pendingApps.length === 0 ? (
+                <div style={{ padding: 'var(--spacing-lg)', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                  No pending applications.
+                </div>
+              ) : (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>App ID</th>
+                      <th>Customer</th>
+                      <th>Status</th>
+                      <th>Submitted Date</th>
+                      <th className="actions">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {pendingApps.slice(0, 5).map(app => (
+                      <tr key={app.id}>
+                        <td style={{ fontWeight: '500' }}>APP-{app.id}</td>
+                        <td>{app.Customer?.name || `Customer #${app.customer_id}`}</td>
+                        <td><StatusBadge status={app.status} /></td>
+                        <td>{new Date(app.submitted_at || app.createdAt).toLocaleDateString()}</td>
+                        <td className="actions">
+                          <Link to={`/agent/applications/${app.id}`} className="btn-text">Review</Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+
+          {/* Recent Activity */}
+          <div className="card">
+            <div className="card-header">
+              <h3>Recent Activity</h3>
+            </div>
+            <div className="data-table-container">
+              {allAgentActivity.length === 0 ? (
+                <div style={{ padding: 'var(--spacing-lg)', textAlign: 'center', color: 'var(--text-muted)', fontSize: '13px' }}>
+                  No recent activity.
+                </div>
+              ) : (
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Reference</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                      <th className="actions">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {allAgentActivity.map((activity, idx) => (
+                      <tr key={`${activity.type}-${activity.id}-${idx}`}>
+                        <td style={{ fontWeight: '500' }}>{activity.type}</td>
+                        <td>{activity.ref}</td>
+                        <td><StatusBadge status={activity.status} /></td>
+                        <td>{new Date(activity.date).toLocaleDateString()}</td>
+                        <td className="actions">
+                          <Link to={activity.link} className="btn-text">View</Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -55,9 +200,9 @@ export default function Dashboard({ role }) {
 
   // Recent Activity Merge (Taking latest 5 items across policies, apps, quotes)
   const allActivity = [
-    ...(data?.policies || []).map(p => ({ type: 'Policy', id: p.id, ref: p.policy_number, status: p.status, date: p.createdAt, link: `/customer/policies/${p.id}` })),
-    ...(data?.applications || []).map(a => ({ type: 'Application', id: a.id, ref: `APP-${a.id}`, status: a.status, date: a.createdAt, link: `/customer/applications` })),
-    ...(data?.quotes || []).map(q => ({ type: 'Quote', id: q.id, ref: `QT-${q.id}`, status: q.status, date: q.createdAt, link: `/customer/quotes` }))
+    ...(data?.policies || []).map(p => ({ type: 'Policy', id: p.id, ref: p.policy_number, status: p.status, date: p.created_at || p.createdAt, link: `/customer/policies/${p.id}` })),
+    ...(data?.applications || []).map(a => ({ type: 'Application', id: a.id, ref: `APP-${a.id}`, status: a.status, date: a.submitted_at || a.createdAt, link: `/customer/applications` })),
+    ...(data?.quotes || []).map(q => ({ type: 'Quote', id: q.id, ref: `QT-${q.id}`, status: q.status, date: q.created_at || q.createdAt, link: `/customer/quotes` }))
   ].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
 
   const currentDate = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
